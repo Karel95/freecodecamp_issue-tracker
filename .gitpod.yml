@@ -1,13 +1,16 @@
+# .gitpod.yml
 image: gitpod/workspace-node-lts
 
 ports:
   - port: 3000
     onOpen: open-preview
     visibility: public
+  - port: 27017
+    visibility: private
 
 tasks:
   - name: Start MongoDB and app
     init: |
-      sudo service mongodb start
+      docker-compose up -d
       npm install
     command: npm run start
