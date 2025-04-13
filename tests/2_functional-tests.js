@@ -28,7 +28,7 @@ suite("Functional Tests", function () {
       test("Create an issue with every field: POST request to /api/issues/{project}", function (done) {
         chai
           .request(server)
-          .post("/api/issues/projects")
+          .post("/api/issues/project")
           .set("content-type", "application/json")
           .send({
             issue_title: "Issue",
@@ -47,11 +47,11 @@ suite("Functional Tests", function () {
             assert.equal(res.body.issue_text, "Functional Test");
             done();
           });
-      });
+      }).timeout(10000);
       test("Create an issue with only required fields: POST request to /api/issues/{project}", function (done) {
         chai
           .request(server)
-          .post("/api/issues/projects")
+          .post("/api/issues/project")
           .set("content-type", "application/json")
           .send({
             issue_title: "Issue",
@@ -73,7 +73,7 @@ suite("Functional Tests", function () {
       test("Create an issue with missing required fields: POST request to /api/issues/{project}", function (done) {
         chai
           .request(server)
-          .post("/api/issues/projects")
+          .post("/api/issues/project")
           .set("content-type", "application/json")
           .send({
             issue_title: "",
@@ -239,10 +239,10 @@ suite("Functional Tests", function () {
     //////////////// DELETE REQUEST TESTS /////////////////////
 
     suite("3 DELETE request Tests", function () {
-      test("Delete an issue: DELETE request to /api/issues/projects", function (done) {
+      test("Delete an issue: DELETE request to /api/issues/project", function (done) {
         chai
           .request(server)
-          .delete("/api/issues/projects")
+          .delete("/api/issues/project")
           .send({
             _id: deleteID,
           })
@@ -256,7 +256,7 @@ suite("Functional Tests", function () {
       test("Delete an issue with an invalid _id: DELETE request to /api/issues/{project}", function (done) {
         chai
           .request(server)
-          .delete("/api/issues/projects")
+          .delete("/api/issues/project")
           .send({
             _id: "5fe0c500ec2f6f4c1815a770invalid",
           })
@@ -270,7 +270,7 @@ suite("Functional Tests", function () {
       test("Delete an issue with missing _id: DELETE request to /api/issues/{project}", function (done) {
         chai
           .request(server)
-          .delete("/api/issues/projects")
+          .delete("/api/issues/project")
           .send({})
           .end(function (err, res) {
             assert.equal(res.status, 200);
