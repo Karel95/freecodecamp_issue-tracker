@@ -1,80 +1,89 @@
 'use strict';
 
-var express     = require('express');
-var bodyParser  = require('body-parser');
-var expect      = require('chai').expect;
-var cors        = require('cors');
-var helmet      = require('helmet')
-var mongoose    = require('mongoose')
+// .env file can hold PORT variable if desired
+require('dotenv').config();
 
-var apiRoutes         = require('./routes/api.js');
-var fccTestingRoutes  = require('./routes/fcctesting.js');
-var runner            = require('./test-runner');
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 
-var app = express();
+const DBConnection = require('./dbconnection.js');
+const apiRoutes = require('./routes/api.js');
+const fccTestingRoutes = require('./routes/fcctesting.js');
+const runner = require('./test-runner');
 
-mongoose.Promise = global.Promise
-const dbName = 'issue-tracker'
-mongoose.connect(`${process.env.DB}${dbName}`, { useNewUrlParser: true })
-const db = mongoose.connection
-db.on('error', err => { console.error(err) })
-db.once('open', () => {
-  console.log('Connected to ' + dbName)
-})
+const app = express();
 
-// Close MongoDB connection
-process.on('SIGINT', () => {
-  db.close(() => {
-    console.log(`Closing connection to ${dbName}`)
-    process.exit(0)
-  })
-})
+// Log incoming requests in development:
+if (process.env.RUN_MODE === 'development') {
+  app.use((req, res, next) => {
+    console.log(
+      `${req.method} ${req.path}; IP=${req.ip}; https?=${req.secure}`,
+    );
+    next();
+  });
+}
 
+// Serve static files from /public folder on any request to /public
 app.use('/public', express.static(process.cwd() + '/public'));
 
-app.use(cors({origin: '*'})); //For FCC testing purposes only
+app.use(cors({ origin: '*' })); // For FCC testing purposes only
 
+// Parse request JSON and url encoded bodies
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(helmet())
 
-//Sample front-end
-app.route('/:project/')
-  .get(function (req, res) {
-    res.sendFile(process.cwd() + '/views/issue.html');
+// Connect to DB before connecting app routes:
+DBConnection.getClient()
+  .then(async (dbClient) => {
+    // Front end for specific project issues:
+    app.route('/:project/').get(function (req, res) {
+      res.sendFile(__dirname + '/views/issue.html');
+    });
+
+    // Serve index.html page on get request to '/'
+    app.route('/').get(function (req, res) {
+      res.sendFile(__dirname + '/views/index.html');
+    });
+
+    // For FCC testing purposes
+    fccTestingRoutes(app);
+
+    // Routing for API
+    await apiRoutes(app);
+
+    // 404 page not found:
+    app.get('*', (req, res) => {
+      console.log('HIT 404 ROUTE');
+      // Redirect to index
+      res.redirect('/');
+    });
+  })
+  .catch((err) => {
+    // If an error occurs, respond to requests with error message
+    console.error('Error when trying to set up routes with DB: ', err);
+    app.use('*', (req, res) => res.send('Database connection error!'));
   });
 
-//Index page (static HTML)
-app.route('/')
-  .get(function (req, res) {
-    res.sendFile(process.cwd() + '/views/index.html');
-  });
-
-//For FCC testing purposes
-fccTestingRoutes(app);
-
-//Routing for API 
-apiRoutes(app);  
-    
-//404 Not Found Middleware
-app.use(function(req, res, next) {
-  res.status(404)
-    .type('text')
-    .send('Not Found');
+// Internal Error Handler:
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Internal Server error: See Server Logs');
 });
 
-//Start our server and tests!
-app.listen(process.env.PORT || 3000, function () {
-  console.log("Listening on port " + process.env.PORT);
-  if(process.env.NODE_ENV==='test') {
+// Have server listen on PORT or default to 3000
+// http://localhost:3000/
+// If NODE_ENV='test' then tests will be run on startup
+const listener = app.listen(process.env.PORT || 3000, function () {
+  console.log('Your app is listening on port ' + listener.address().port);
+  if (process.env.NODE_ENV === 'test') {
     console.log('Running Tests...');
     setTimeout(function () {
       try {
         runner.run();
-      } catch(e) {
-        var error = e;
-          console.log('Tests are not valid:');
-          console.log(error);
+      } catch (e) {
+        console.log('Tests are not valid:');
+        console.error(e);
       }
     }, 3500);
   }

@@ -1,0 +1,81 @@
+const creationDate = new Date();
+
+// Some sample issues that are added on server boot
+const sampleIssues = [
+  {
+    project_name: 'sampleProject',
+    issue_title: 'Sample Issue 1',
+    issue_text: 'Sample Open Issue on sampleProject for Demonstration',
+    created_by: 'Issue Tracker Bot',
+    assigned_to: 'Paul',
+    status_text: 'Ready to move to QA',
+    open: true,
+    created_on: creationDate,
+    updated_on: creationDate,
+    expireXSecondsFrom: creationDate,
+  },
+  {
+    project_name: 'sampleProject',
+    issue_title: 'Sample Issue 2',
+    issue_text: 'Sample Closed Issue on sampleProject for Demonstration',
+    created_by: 'Issue Tracker Bot',
+    assigned_to: 'Paul',
+    status_text: 'Ready to move to QA',
+    open: false,
+    created_on: creationDate,
+    updated_on: creationDate,
+    expireXSecondsFrom: creationDate,
+  },
+  {
+    project_name: 'sampleProject',
+    issue_title: 'Sample Issue 3',
+    issue_text:
+      'Sample Open Issue assigned to James on sampleProject for Demonstration',
+    created_by: 'Issue Tracker Bot',
+    assigned_to: 'James',
+    status_text: 'Ready to move to QA',
+    open: true,
+    created_on: creationDate,
+    updated_on: creationDate,
+    expireXSecondsFrom: creationDate,
+  },
+  {
+    project_name: 'sampleProject',
+    issue_title: 'Sample Issue 4',
+    issue_text:
+      'Sample Closed Issue assigned to James on sampleProject for Demonstration',
+    created_by: 'Issue Tracker Bot',
+    assigned_to: 'James',
+    status_text: 'Ready to move to QA',
+    open: false,
+    created_on: creationDate,
+    updated_on: creationDate,
+    expireXSecondsFrom: creationDate,
+  },
+  {
+    project_name: 'apiTest',
+    issue_title: 'Sample apiTest Issue 1',
+    issue_text: 'This is an example of an open Issue on the apiTest Project',
+    created_by: 'Issue Tracker Bot',
+    assigned_to: 'James',
+    status_text: 'Ready to move to QA',
+    open: true,
+    created_on: creationDate,
+    updated_on: creationDate,
+    expireXSecondsFrom: creationDate,
+  },
+  {
+    project_name: 'apiTest',
+    issue_title: 'Sample apiTest Issue 2',
+    issue_text: 'This is an example of a closed Issue on the apiTest Project',
+    created_by: 'Issue Tracker Bot',
+    assigned_to: 'Paul',
+    status_text: 'Ready to move to QA',
+    open: false,
+    created_on: creationDate,
+    updated_on: creationDate,
+    expireXSecondsFrom: creationDate,
+  },
+];
+
+module.exports = sampleIssues;
