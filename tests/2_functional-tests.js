@@ -2,7 +2,7 @@
 const { ObjectId } = require('mongodb');
 
 const DBConnection = require('../dbconnection');
-const sampleIssues = require('./sampleIssues.js');
+const sampleIssues = require('../controllers/sampleIssues');
 
 const DB_NAME = process.env.DB_NAME;
 
